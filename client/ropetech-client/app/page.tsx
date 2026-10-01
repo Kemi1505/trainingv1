@@ -100,7 +100,17 @@ export default function LandingPage() {
           </div>
           {/* TODO: replace with real industrial/training photography */}
           <div className="flex h-72 items-center justify-center rounded-lg border border-dashed border-brand-200 bg-brand-50 px-6 text-center text-sm text-brand-400 lg:h-96">
-            Hero image placeholder — large industrial/training photograph
+            import Image from "next/image";
+
+            <div className="relative h-72 overflow-hidden rounded-lg lg:h-96">
+              <Image
+               src="/hero-image.jpg"
+               alt="Ropetech industrial training"
+               fill
+               className="object-cover"
+               priority
+               />
+            </div>
           </div>
         </section>
 
@@ -137,7 +147,7 @@ export default function LandingPage() {
                 >
                   {/* TODO: swap for the real course picture once GET /courses is wired in */}
                   <div className="flex h-40 items-center justify-center bg-brand-50 text-sm text-brand-400">
-                    Course image placeholder
+                    Course Image Example 
                   </div>
                   <div className="p-5">
                     <h3 className="font-semibold text-brand-700">{course.title}</h3>
