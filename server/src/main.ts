@@ -7,7 +7,7 @@ async function bootstrap() {
   
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true,
-    transform: true local NEXT_PUBLIC
+    transform: true
   }))
 
   app.enableCors({ 
