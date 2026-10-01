@@ -1,0 +1,188 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AuthMethod {
+  EMAIL_AND_PASSWORD
+  GOOGLE
+}
+
+enum Role {
+  USER
+  ADMIN
+  SUPERADMIN
+}
+
+enum PaymentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum CertificationStatus {
+  NONE
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum ContentType {
+  MANUAL
+  SLIDE
+}
+
+model User {
+  id        String   @id @default(uuid()) 
+  email     String   @unique
+  password  String?
+  role      Role     @default(USER)
+  authType AuthMethod @default(EMAIL_AND_PASSWORD)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profile               Profile?
+  refreshTokens      RefreshToken[]
+  enrollments           Enrollment[]
+  paymentSubmissions    PaymentSubmission[]
+  assessmentSubmissions AssessmentSubmission[]
+}
+
+model RefreshToken {
+  id          String      @id @default(uuid())
+  hashedToken String   @unique
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Profile {
+  id                       String              @id @default(uuid())
+  userId                   String              @unique
+  user                     User                @relation(fields: [userId], references: [id])
+  firstName                String
+  lastName                 String
+  company                  String?
+  phone                    String
+  hasPreviousCertification Boolean             @default(false)
+  certificateFile          Bytes?
+  certificateMime          String?
+  certificateName          String?
+  certificationStatus      CertificationStatus @default(NONE)
+  verifiedBy               String?
+  verifiedAt               DateTime?
+  createdAt                DateTime            @default(now())
+  updatedAt                DateTime            @updatedAt
+}
+
+enum CourseDifficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+model Course {
+  id                            String           @id @default(uuid())
+  title                         String
+  description                  String
+  price                         Decimal
+  pictureData                   Bytes?
+  pictureMime                   String?
+  pictureName                   String?
+  requirements                  String?
+  category                      String?
+  difficulty                    CourseDifficulty @default(BEGINNER)
+  learningOutcomes              String[]         @default([])
+  requiresPreviousCertification Boolean          @default(false)
+  isPublished                   Boolean          @default(false)
+  createdAt                     DateTime         @default(now())
+  updatedAt                     DateTime         @updatedAt
+
+  enrollments  Enrollment[]
+  contentItems ContentItem[]
+  questions    Question[]
+  paymentSubmissions    PaymentSubmission[]
+  assessmentSubmissions AssessmentSubmission[]
+}
+
+model Enrollment {
+  id            String        @id @default(uuid())
+  userId        String
+  user          User          @relation(fields: [userId], references: [id])
+  courseId      String
+  course        Course        @relation(fields: [courseId], references: [id])
+  paymentStatus PaymentStatus @default(PENDING)
+  enrolledAt    DateTime      @default(now())
+
+  @@unique([userId, courseId])
+}
+
+
+model PaymentSubmission {
+  id               String        @id @default(uuid())
+  userId           String
+  user             User          @relation(fields: [userId], references: [id])
+  courseId         String
+  course           Course        @relation(fields: [courseId], references: [id])
+  amountPaid       Decimal
+  payerAccountName String
+  status           PaymentStatus @default(PENDING)
+  submittedAt      DateTime      @default(now())
+  reviewedAt       DateTime?
+  reviewedBy       String?
+}
+
+// Manuals only for now (per your note — slides come later as a new field/model).
+// Stored as bytes in Postgres, same reasoning as Profile.certificateFile.
+model ContentItem {
+  id        String   @id @default(uuid())
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id])
+  title     String
+  fileData  Bytes
+  mimeType  String
+  fileName  String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+model Question {
+  id       String   @id @default(uuid())
+  courseId String
+  course   Course   @relation(fields: [courseId], references: [id])
+  text     String
+  order    Int      @default(0)
+  options  Option[]
+}
+
+model Option {
+  id         String   @id @default(uuid())
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  text       String
+  isCorrect  Boolean  @default(false)
+}
+
+model AssessmentSubmission {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  courseId    String
+  course      Course   @relation(fields: [courseId], references: [id])
+  score       Int
+  passed      Boolean
+  submittedAt DateTime @default(now())
+
+  @@unique([userId, courseId])
+}
