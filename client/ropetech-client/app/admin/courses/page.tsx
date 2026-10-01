@@ -93,7 +93,7 @@ export default function AdminCoursesPage() {
                   </span>
                 </div>
                 <p className="mt-1 text-sm text-black">{course.category ?? 'Uncategorized'}</p>
-                <p className="mt-2 text-sm font-medium text-black">${course.price}</p>
+                <p className="mt-2 text-sm font-medium text-black">₦{course.price}</p>
 
                 <Button
                   variant="outline"
