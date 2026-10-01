@@ -77,7 +77,7 @@ export default function AdminDashboardPage() {
     <AdminLayout email={email}>
       <div className="mx-auto w-full max-w-6xl">
 
-        {/* Header */}
+        {/* Header$ */}
         <div>
           <h1 className="text-2xl font-bold text-brand-800">
             Welcome back, Admin
