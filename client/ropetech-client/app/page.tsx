@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { Logo } from '@/components/Logo';
 import { LinkButton } from '@/components/Button';
 import { Footer } from '@/components/Footer';
+import Image from "next/image";
+
 
 const features = [
   {
@@ -100,11 +102,11 @@ export default function LandingPage() {
           </div>
           {/* TODO: replace with real industrial/training photography */}
           <div className="flex h-72 items-center justify-center rounded-lg border border-dashed border-brand-200 bg-brand-50 px-6 text-center text-sm text-brand-400 lg:h-96">
-            import Image from "next/image";
+            
 
             <div className="relative h-72 overflow-hidden rounded-lg lg:h-96">
               <Image
-               src="/hero-image.jpg"
+               src="/Hero Image.jpg"
                alt="Ropetech industrial training"
                fill
                className="object-cover"
